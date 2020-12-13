@@ -44,7 +44,7 @@ def get_filters():
     i = 0
     wrong_answer = 0
     while i == 0:
-        city = input('What city would you like to view:  Chicago, New York, Washington or All? \n').lower()
+        city = input('What city would you like to view:  All, Chicago, New York, Washington? \n').lower()
         cities =['chicago','new york','washington','all']
         if city in cities:
             i+= 1
