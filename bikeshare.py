@@ -35,7 +35,7 @@ def get_filters():
     i = 0
     wrong_answer = 0
     while i == 0:
-        city = input('What city would you like to view:  Chicago, New York, Washington or All? \n').lower()
+        city = input('What city would you like to view:  All, Chicago, New York, Washington? \n').lower()
         cities =['chicago','new york','washington','all']
         if city in cities:
             i+= 1
@@ -48,7 +48,7 @@ def get_filters():
                 if city_error == 'yes':
                     continue
                 else :
-                    raise SystemExit('This program has now ended.  Thank you for participating.\n\n')  
+                    raise SystemExit('This program has now ended.  Thank you for participating.\n\n')
 
     #Input Month filter type (all, january, february, ... , june)
     while i==1:
