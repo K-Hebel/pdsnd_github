@@ -5,7 +5,7 @@ import calendar
 import datetime
 from matplotlib import pyplot as plt
 
-#This program presents Bikeshare Data from three cities, Chicago, New York and Washington.  Users may view descriptive statistics of this data filtered by city or as an aggregation of all cities.   Users may also choose to filter data by month (January - June) and/or by day (Sunday-Saturday).   
+#This program presents Bikeshare Data from three cities, Chicago, New York and Washington.  Users may view descriptive statistics of this data filtered by city or as an aggregation of all cities.   Users may also choose to filter data by month (January - June) and/or by day (Sunday-Saturday).
 
 #This interactive program requires user input for user's name, data filter types, request for raw_data (viewed in lines of five), and request to repeat or end the program.
 
@@ -26,23 +26,30 @@ def get_filters():
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
 
-    #Input User name    
+    #Input User name
     name = input('What is your name? \n')
-    print('\nHello {}! Let\'s explore some US bikeshare data!\n'.format(name.title()))
-    
-    
+    print('\nHello {}! Are you ready to explore some US bikeshare data with me?  Let\'s go!\n'.format(name.title()))
+
+
     #Input City filter type, cities are contained in a list 'cities'. Additional city names may be added to the list as their data files are added to the CITY_DATA dictionary at the top of this file.
     i = 0
+    wrong_answer = 0
     while i == 0:
         city = input('What city would you like to view:  Chicago, New York, Washington or All? \n').lower()
         cities =['chicago','new york','washington','all']
-        if city in cities:            
+        if city in cities:
             i+= 1
-            print('Perfect, you chose to view data for {}. Next Question......\n'.format(city.title()))  
+            print('Perfect, you chose to view data for {}. Next Question......\n'.format(city.title()))
         else :
-            print('The city name you entered is incorrect please try again.\n')           
-               
-    
+            print('The city name you entered is incorrect please try again.\n')
+            wrong_answer += 1
+            if wrong_answer >= 3 :
+                city_error=input('You have entered an incorrect city name 3 times, do you want to continue?  yes or no \n\n').lower()
+                if city_error == 'yes':
+                    continue
+                else :
+                    raise SystemExit('This program has now ended.  Thank you for participating.\n\n')  
+
     #Input Month filter type (all, january, february, ... , june)
     while i==1:
         month = input('\nWhat month of data would you like to review (All, January, February,....June)?\n').title()
@@ -51,8 +58,8 @@ def get_filters():
             i+=1
         else :
             print('\nThe month you entered is invalid, please try again.  Thanks\n')
-    
-    
+
+
     #Input Day of Week filter type (all, monday, tuesday, ... sunday)
     while i==2:
         day = input('\nWhat day of the week would you like to review (All, Sunday, Monday, Tuesday,....Saturday)?   \n').title()
@@ -63,7 +70,7 @@ def get_filters():
             print('\nThe day of the week you entered is incorrect, please try again.  I appreciate you.\n')
 
     print('-'*40)
-    
+
     return city, month, day
 
 
@@ -78,51 +85,51 @@ def load_data(city, month, day):
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
-    """  
+    """
 
     #Reads CITY_DATA files based on the filter for a specific city.
-    if city != 'all': 
+    if city != 'all':
         df = pd.read_csv(CITY_DATA[city])
-        
-    #Reads and Combines all files in CITY_DATA into one dataframe df based on the 'All' filter for City        
-    else:    
+
+    #Reads and Combines all files in CITY_DATA into one dataframe df based on the 'All' filter for City
+    else:
         i=0
         df_files = []
         while i < len(CITY_DATA):
             for city, csv_file in CITY_DATA.items():
                 df_files.append(pd.read_csv(csv_file))
-                i+=1   
+                i+=1
         df =pd.concat(df_files, sort=True)
-        
-    #Converts string values to datetime and adds additional columns for Month, Day of Week and Start Hour        
+
+    #Converts string values to datetime and adds additional columns for Month, Day of Week and Start Hour
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['End Time'] = pd.to_datetime(df['End Time'])
     df['Month'] =df['Start Time'].dt.month
     df['Day of Week'] =df['Start Time'].dt.dayofweek
     df['Start Hour'] = df['Start Time'].dt.hour
-    
-    
+
+
     # filter by month if applicable
     if month != 'All':
         months = list(calendar.month_name[:7])
         month = months.index(month)
-    
+
     # filter by month to create the new dataframe
         df = df[df['Month']==month]
 
-    
+
     # filter by day of week if applicable
     if day != 'All':
         days = list(calendar.day_name)
         day= days.index(day)
         df = df[df['Day of Week']==day]
-    
+
     return df
 
 
 #Displays statistics on the most frequent times of travel.
 def time_stats(df,month,day):
-   
+
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
 
@@ -134,10 +141,10 @@ def time_stats(df,month,day):
         plt.ylabel('# of Users')
         plt.title('Trend Line of Users Per Month')
         plt.show()
-    
+
     # Display the most frequent month
     print('\nThe busiest month was:  ',calendar.month_name[(df['Month'].mode()[0])])
-    
+
     #Display line Chart of total number of users per day when 'day' =='All'
     if day == 'All':
         df_day= df.groupby(['Day of Week']).count()
@@ -146,11 +153,11 @@ def time_stats(df,month,day):
         plt.ylabel('# of Users')
         plt.title('Trend Line of Users Per Day')
         plt.show()
-    
+
     # Display the most common day of week
     print("\nThe busiest day of the week was:  ",calendar.day_name[(df['Day of Week'].mode()[0])])
-    
-    
+
+
     #Display line Chart of total Usage over 24 hours
     df_hour= df.groupby(['Start Hour']).count()
     plt.plot(pd.date_range(start='1/1/2020', periods=24 ,freq='H').strftime('%I:00 %p'),df_hour['Start Time'])
@@ -162,7 +169,7 @@ def time_stats(df,month,day):
     # Display the most common start hour
     start_hour = df['Start Hour'].mode()[0]
     print("\nThe most common starting hour was:   ", datetime.time(start_hour).strftime("%I:00 %p"))
-    
+
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -209,11 +216,11 @@ def user_stats(df):
 
     print('\nCalculating User Stats...\n')
     start_time = time.time()
-        
+
     # Display counts of user types
     print('\nThe count of users by user type is:\n',df['User Type'].value_counts())
 
-    
+
     #Display bar chart of Users based on Gender, if gender column is included in data
     if 'Gender' in df.columns:
         df_gender= df.groupby(['Gender']).count()
@@ -221,13 +228,13 @@ def user_stats(df):
         plt.ylabel('Number of Users')
         plt.title('All Users by Gender')
         plt.show()
- 
+
     # Display counts of gender if data available
         print('\n\nThe count of users by gender is:\n', df['Gender'].value_counts())
     else :
         print('\nThis data set does not contain information on gender.\n\n')
 
-        
+
     # Display earliest, most recent, and most common year of birth if data available
     if 'Birth Year' in df.columns:
         print('\nThe earliest year of user birth is: ',int(df['Birth Year'].min()), '\n\nThe most recent birth year is: ',int(df['Birth Year'].max()), '\n\nAnd the most common birth year was:  ',int(df['Birth Year'].mean()))
@@ -237,7 +244,7 @@ def user_stats(df):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
-    
+
 #Display 5 lines of raw data from filtered dataframe based on user input (yes/no)
 def more_raw_data(df):
     more = input('\n\nWould you like to see 5 lines of data from the raw data set?  Yes or No\n').lower()
@@ -251,7 +258,7 @@ def more_raw_data(df):
                 break
     else :
         print('\n\nThank you for looking at this data.  We hope that it was useful and informative.  Have a great day')
-                      
+
 
 def main():
     while True:
