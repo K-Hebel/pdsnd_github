@@ -37,13 +37,12 @@ def get_filters():
 
     #Input User name
     name = input('What is your name? \n')
-    print('\nHello {}! Let\'s explore some US bikeshare data!\n'.format(name.title()))
+    print('\nHello {}! Are you ready to explore some US bikeshare data with me?  Let\'s go!\n'.format(name.title()))
 
 
-    #Input City filter type, cities are contained in a list 'cities'.
-    #Additional city names may be added to the list as their data files are added to the
-    #CITY_DATA dictionary at the top of this file.
+    #Input City filter type, cities are contained in a list 'cities'. Additional city names may be added to the list as their data files are added to the CITY_DATA dictionary at the top of this file.
     i = 0
+    wrong_answer = 0
     while i == 0:
         city = input('What city would you like to view:  Chicago, New York, Washington or All? \n').lower()
         cities =['chicago','new york','washington','all']
@@ -52,7 +51,13 @@ def get_filters():
             print('Perfect, you chose to view data for {}. Next Question......\n'.format(city.title()))
         else :
             print('The city name you entered is incorrect please try again.\n')
-
+            wrong_answer += 1
+            if wrong_answer >= 3 :
+                city_error=input('You have entered an incorrect city name 3 times, do you want to continue?  yes or no \n\n').lower()
+                if city_error == 'yes':
+                    continue
+                else :
+                    raise SystemExit('This program has now ended.  Thank you for participating.\n\n')
 
     #Input Month filter type (all, january, february, ... , june)
     while i==1:
@@ -118,6 +123,8 @@ def load_data(city, month, day):
     if month != 'All':
         months = list(calendar.month_name[:7])
         month = months.index(month)
+
+    # filter by month to create the new dataframe
         df = df[df['Month']==month]
 
 
