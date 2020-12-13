@@ -44,7 +44,7 @@ def get_filters():
             print('The city name you entered is incorrect please try again.\n')
             wrong_answer += 1
             if wrong_answer >= 3 :
-                city_error=input('You have entered an incorrect city name 3 times, do you want to continue?  yes or no \n\n').lower()
+                city_error=input('You have entered an incorrect city name at least 3 times, do you want to continue?  yes or no \n\n').lower()
                 if city_error == 'yes':
                     continue
                 else :
